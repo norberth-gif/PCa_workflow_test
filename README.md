@@ -1,12 +1,10 @@
-# Exploring With Transcriptomic Approaches the Underlying Mechanisms of an Essential Oil-Based Phytogenic in the Small Intestine and Liver of Pigs
-*Le Coz J, Ilic S, Fibi-Smetana S, Schatzmayr G, Zaunschirm M, Grenier B. (2021)*
-# Group 4: NextFlow Analysis
+# Comparison of LNCaP Gene Expression Data from PMID: 36167836 Using RNA-Seq Tools 
 
 # RNA-seq Analysis Workflow
 
 This project provides a reproducible RNA-seq analysis workflow using **Nextflow** and **R**. It covers all steps from reference genome preparation to differential expression analysis and functional enrichment visualization.
 
-The workflow was developed for the Workflow Design project, subject 2: oxidative stress in pig liver. The aim is to reproduce parts of the transcriptomic analysis from the pig liver dataset, especially Figure 2A, and to perform a functional enrichment analysis for the clustered genes.
+The workflow was developed for an exercise project. The aim is to compare various treatments of LNCaP cells and to perform functional pathway analysis for the clustered genes.
 
 
 ## Table of Contents
