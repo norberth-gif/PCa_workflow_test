@@ -6,15 +6,15 @@ process FUNCTIONAL_ENRICHMENT {
     path cluster_csv
 
     output:
-    path "Figure_2B_Barplot.pdf", emit: plotB
+    path "Enrichment_Barplot.pdf", emit: plotB
 
     script:
     """
     #!/usr/bin/env Rscript
-    library(clusterProfiler); library(org.Ss.eg.db); library(ggplot2)
+    library(clusterProfiler); library(org.Hs.eg.db); library(ggplot2)
 
     write_message_pdf <- function(message) {
-        pdf("Figure_2B_Barplot.pdf", width=11, height=8)
+        pdf("Enrichment_Barplot.pdf", width=11, height=8)
         plot.new()
         text(0.5, 0.5, message)
         dev.off()
@@ -53,7 +53,7 @@ process FUNCTIONAL_ENRICHMENT {
     gene2ensembl <- read.delim(gzfile(gene2ensembl_file), stringsAsFactors = FALSE, check.names = FALSE)
     tax_col <- names(gene2ensembl)[1]
     pig_map <- gene2ensembl[
-        gene2ensembl[[tax_col]] == 9823 &
+        gene2ensembl[[tax_col]] == 9606 &
         gene2ensembl[["Ensembl_gene_identifier"]] %in% ensembl_genes,
         c("GeneID", "Ensembl_gene_identifier")
     ]
@@ -71,7 +71,7 @@ process FUNCTIONAL_ENRICHMENT {
         write_message_pdf(
             paste(
                 "No Entrez ID mapping found for cluster ${params.enrichment.cluster_id}.",
-                "Mapping source: NCBI gene2ensembl, taxid 9823.",
+                "Mapping source: NCBI gene2ensembl, taxid 9606.",
                 sep = "\\n"
             )
         )
@@ -82,7 +82,7 @@ process FUNCTIONAL_ENRICHMENT {
 
     ego <- enrichGO(
         gene          = as.character(unique(pig_map\$GeneID)),
-        OrgDb         = org.Ss.eg.db,
+        OrgDb         = org.Hs.eg.db,
         keyType       = "ENTREZID",
         ont           = "${params.enrichment.ontology}",
         pAdjustMethod = "${params.enrichment.p_adjust_method}",
@@ -90,12 +90,12 @@ process FUNCTIONAL_ENRICHMENT {
         qvalueCutoff  = ${params.enrichment.qvalue_cutoff}
     )
 
-    pdf("Figure_2B_Barplot.pdf", width=11, height=8)
+    pdf("Enrichment_Barplot.pdf", width=11, height=8)
 
     res_df <- as.data.frame(ego)
     write.table(
         res_df,
-        file = "Figure_2B_enrichment.tsv",
+        file = "Enrichment_plot.tsv",
         sep = "\\t",
         quote = FALSE,
         row.names = FALSE
@@ -124,7 +124,7 @@ process FUNCTIONAL_ENRICHMENT {
         theme_minimal() +
         labs(x="GO term",
              y="-log10(q-value)",
-             title="Figure 2B: Top Enriched Functions")
+             title="Top Enriched Functions")
 
     print(p_bar)
 
