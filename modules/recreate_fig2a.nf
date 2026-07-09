@@ -27,16 +27,11 @@ process RECREATE_FIG2A {
     # make the metadata table from the SRA file
     meta <- data.frame(
         sample = sra\$${params.experimental_design.sample_column},
-        condition = sapply(
-            strsplit(as.character(sra\$${params.experimental_design.treatment_column}), "${params.experimental_design.treatment_delimiter}"),
-            function(x) trimws(tail(x, 1))
-        ),
+        condition = sra\$${params.experimental_design.treatment_column},
         row.names = sra\$${params.experimental_design.sample_column}
     )
 
-    # keep only samples with enough unique mapping
-    keep_ids <- stats\$sample[stats\$percent > ${params.analysis.min_unique_mapping_percent}]
-    common <- intersect(intersect(colnames(counts), rownames(meta)), keep_ids)
+    common <- intersect(colnames(counts), rownames(meta))
 
     meta_sub <- meta[common, , drop=FALSE]
     target_levels <- c(${levels})
@@ -49,7 +44,7 @@ process RECREATE_FIG2A {
 
     sig_res <- res[which(res\$padj < ${params.analysis.padj_cutoff}), ]
     sig_res_ordered <- sig_res[order(sig_res\$pvalue), ]
-    final_genes <- head(rownames(sig_res_ordered), ${params.analysis.top_gene_count})
+    final_genes <- rownames(sig_res_ordered)
 
     vsd_mat   <- assay(vst(dds, blind=FALSE))
     clean_mat <- vsd_mat[final_genes, ]
@@ -77,10 +72,12 @@ process RECREATE_FIG2A {
 
         p <- ggplot(cluster_df, aes(x = condition, y = value, color = condition)) +
              geom_boxplot(size = 1, outlier.shape = 16) +
-             scale_color_manual(values = c("CTR"="#666666", "PFA"="#008000", "OO"="#FF0000", "PFA_OO"="#FFA500")) +
              theme_bw() +
-             labs(y = "Scaled expression", x = "",
-                  title = paste("Cluster", i, ":", length(unique(cluster_df\$genes)), "genes")) +
+             labs(
+                 y = "Scaled expression",
+                 x = "",
+                 title = paste("Cluster", i, ":", length(unique(cluster_df$genes)), "genes")
+             ) +
              theme(legend.position = "none")
 
         print(p)

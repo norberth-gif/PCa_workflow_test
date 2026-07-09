@@ -10,6 +10,7 @@ include { EXTRACT_STAT }            from './modules/extract_stat'
 include { MERGE_STATS }             from './modules/merge_stats'
 include { FUNCTIONAL_ENRICHMENT }   from './modules/functional_enrichment'
 include { MULTIQC }                 from './modules/multiqc' 
+include { VOLCANO_PLOT }            from './modules/volcano_plot'
 
 workflow {
     // first get the pig reference files
@@ -43,6 +44,12 @@ workflow {
     // recreate figure 2 parts
     viz_ch = RECREATE_FIG2A(matrix_ch, stats_ch, file(params.sra_csv))
     FUNCTIONAL_ENRICHMENT(viz_ch.clusters)
+    
+    // volcano plots for all DESeq2 contrasts
+    VOLCANO_PLOT(
+        matrix_ch,
+        file(params.sra_csv)
+    )
 }
 
 
